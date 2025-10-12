@@ -1,10 +1,27 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View, Pressable } from "react-native";
+import { useState } from "react";
 
 export default function App() {
+  const [circlePos, setCirclePos] = useState({ x: 200, y: 200 });
+
+  function handlePress(event: any) {
+    const x = event.nativeEvent.locationX;
+    const y = event.nativeEvent.locationY;
+    setCirclePos({ x, y });
+  }
+
   return (
-    <View style={styles.container}>
-      <View style={styles.circle}></View>
-    </View>
+    <Pressable style={styles.container} onPress={handlePress}>
+      <View
+        style={[
+          styles.circle,
+          {
+            left: circlePos.x - 50,
+            top: circlePos.y - 50,
+          },
+        ]}
+      />
+    </Pressable>
   );
 }
 
