@@ -1,5 +1,6 @@
 import { StyleSheet, View, Pressable, Animated } from "react-native";
 import { useState } from "react";
+import { Audio } from "expo-av";
 
 type Ripple = {
   id: number;
@@ -11,10 +12,14 @@ type Ripple = {
 export default function App() {
   const [ripples, setRipples] = useState<Ripple[]>([]);
 
-  function handlePress(event: any) {
+  async function handlePress(event: any) {
+    const { sound } = await Audio.Sound.createAsync(
+      require("./assets/water-drop.mp3")
+    );
+    await sound.playAsync();
+
     const x = event.nativeEvent.locationX;
     const y = event.nativeEvent.locationY;
-
     const anim = new Animated.Value(0);
     const ripple: Ripple = { id: Date.now(), x, y, anim };
 
