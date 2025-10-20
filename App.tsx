@@ -1,5 +1,5 @@
-import { StyleSheet, View, Pressable, Animated } from "react-native";
-import { useState } from "react";
+import { StyleSheet, Pressable, Animated } from "react-native";
+import { useState, useEffect, useRef } from "react";
 import { Audio } from "expo-av";
 
 type Ripple = {
@@ -12,9 +12,32 @@ type Ripple = {
 export default function App() {
   const [ripples, setRipples] = useState<Ripple[]>([]);
 
+  useEffect(() => {
+    let bgSound: Audio.Sound;
+
+    (async () => {
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+        shouldDuckAndroid: false,
+      });
+
+      const { sound } = await Audio.Sound.createAsync(
+        require("../meditation-ripple/assets/water-stream.mp3"),
+        { volume: 0.25, isLooping: true }
+      );
+      bgSound = sound;
+      await bgSound.playAsync();
+    })();
+
+    return () => {
+      bgSound?.unloadAsync();
+    };
+  }, []);
+
   async function handlePress(event: any) {
     const { sound } = await Audio.Sound.createAsync(
-      require("./assets/water-drop.mp3")
+      require("../meditation-ripple/assets/water-drop.mp3")
     );
     await sound.playAsync();
 
