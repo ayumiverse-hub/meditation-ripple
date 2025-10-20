@@ -2,11 +2,18 @@ import { StyleSheet, Pressable, Animated } from "react-native";
 import { useState, useEffect, useRef } from "react";
 import { Audio } from "expo-av";
 
+let rippleSeq = 0;
+const makeRippleId = () => `${Date.now()}-${rippleSeq++}`;
+
 type Ripple = {
-  id: number;
+  id: string;
   x: number;
   y: number;
   anim: Animated.Value;
+  size: number;
+  startOpacity: number;
+  endScale: number;
+  duration: number;
 };
 
 export default function App() {
@@ -35,26 +42,52 @@ export default function App() {
     };
   }, []);
 
-  async function handlePress(event: any) {
-    const { sound } = await Audio.Sound.createAsync(
-      require("../meditation-ripple/assets/water-drop.mp3")
-    );
-    await sound.playAsync();
-
-    const x = event.nativeEvent.locationX;
-    const y = event.nativeEvent.locationY;
+  function spawnRipple(opts: Omit<Ripple, "id" | "anim">) {
     const anim = new Animated.Value(0);
-    const ripple: Ripple = { id: Date.now(), x, y, anim };
+    const ripple: Ripple = {
+      id: makeRippleId(),
+      anim,
+      ...opts,
+    };
 
     setRipples((curr) => [...curr, ripple]);
 
     Animated.timing(anim, {
       toValue: 1,
-      duration: 1500,
+      duration: ripple.duration,
       useNativeDriver: true,
     }).start(() => {
       setRipples((curr) => curr.filter((r) => r.id !== ripple.id));
     });
+  }
+
+  async function handlePress(event: any) {
+    const { locationX: x, locationY: y } = event.nativeEvent;
+
+    const { sound } = await Audio.Sound.createAsync(
+      require("../meditation-ripple/assets/water-drop.mp3")
+    );
+    await sound.playAsync();
+
+    spawnRipple({
+      x,
+      y,
+      size: 110,
+      startOpacity: 0.5,
+      endScale: 3.0,
+      duration: 1500,
+    });
+
+    setTimeout(() => {
+      spawnRipple({
+        x,
+        y,
+        size: 70,
+        startOpacity: 0.2,
+        endScale: 1.5,
+        duration: 1200,
+      });
+    }, 300);
   }
 
   return (
