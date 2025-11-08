@@ -1,5 +1,5 @@
 import { StyleSheet, Pressable, Animated } from "react-native";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Audio } from "expo-av";
 
 let rippleSeq = 0;
@@ -93,28 +93,27 @@ export default function App() {
   return (
     <Pressable style={styles.container} onPress={handlePress}>
       {ripples.map((r) => {
-        const size = 100;
         return (
           <Animated.View
             key={r.id}
             style={[
               styles.circle,
               {
-                left: r.x - size / 2,
-                top: r.y - size / 2,
-                width: size,
-                height: size,
+                left: r.x - r.size / 2,
+                top: r.y - r.size / 2,
+                width: r.size,
+                height: r.size,
                 transform: [
                   {
                     scale: r.anim.interpolate({
                       inputRange: [0, 1],
-                      outputRange: [0.1, 3],
+                      outputRange: [0.1, r.endScale],
                     }),
                   },
                 ],
                 opacity: r.anim.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [0.5, 0],
+                  outputRange: [r.startOpacity, 0],
                 }),
               },
             ]}
