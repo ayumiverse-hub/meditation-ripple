@@ -1,137 +1,55 @@
-import { StyleSheet, Pressable, Animated } from "react-native";
-import { useState, useEffect } from "react";
-import { Audio } from "expo-av";
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 
-let rippleSeq = 0;
-const makeRippleId = () => `${Date.now()}-${rippleSeq++}`;
+import HomeScreen from "./screens/HomeScreen";
+import MeditationScreen from "./screens/MeditationScreen";
+import AboutScreen from "./screens/AboutScreen";
 
-type Ripple = {
-  id: string;
-  x: number;
-  y: number;
-  anim: Animated.Value;
-  size: number;
-  startOpacity: number;
-  endScale: number;
-  duration: number;
+const stack = createStackNavigator;
+
+type RootStackParamList = {
+  Home: undefined;
+  Meditation: undefined;
+  About: undefined;
 };
 
+const Stack = createStackNavigator<RootStackParamList>();
+
 export default function App() {
-  const [ripples, setRipples] = useState<Ripple[]>([]);
-
-  useEffect(() => {
-    let bgSound: Audio.Sound;
-
-    (async () => {
-      await Audio.setAudioModeAsync({
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: false,
-        shouldDuckAndroid: false,
-      });
-
-      const { sound } = await Audio.Sound.createAsync(
-        require("../meditation-ripple/assets/water-stream.mp3"),
-        { volume: 0.25, isLooping: true }
-      );
-      bgSound = sound;
-      await bgSound.playAsync();
-    })();
-
-    return () => {
-      bgSound?.unloadAsync();
-    };
-  }, []);
-
-  function spawnRipple(opts: Omit<Ripple, "id" | "anim">) {
-    const anim = new Animated.Value(0);
-    const ripple: Ripple = {
-      id: makeRippleId(),
-      anim,
-      ...opts,
-    };
-
-    setRipples((curr) => [...curr, ripple]);
-
-    Animated.timing(anim, {
-      toValue: 1,
-      duration: ripple.duration,
-      useNativeDriver: true,
-    }).start(() => {
-      setRipples((curr) => curr.filter((r) => r.id !== ripple.id));
-    });
-  }
-
-  async function handlePress(event: any) {
-    const { locationX: x, locationY: y } = event.nativeEvent;
-
-    const { sound } = await Audio.Sound.createAsync(
-      require("../meditation-ripple/assets/water-drop.mp3")
-    );
-    await sound.playAsync();
-
-    spawnRipple({
-      x,
-      y,
-      size: 110,
-      startOpacity: 0.5,
-      endScale: 3.0,
-      duration: 1500,
-    });
-
-    setTimeout(() => {
-      spawnRipple({
-        x,
-        y,
-        size: 70,
-        startOpacity: 0.2,
-        endScale: 1.5,
-        duration: 1200,
-      });
-    }, 300);
-  }
-
   return (
-    <Pressable style={styles.container} onPress={handlePress}>
-      {ripples.map((r) => {
-        return (
-          <Animated.View
-            key={r.id}
-            style={[
-              styles.circle,
-              {
-                left: r.x - r.size / 2,
-                top: r.y - r.size / 2,
-                width: r.size,
-                height: r.size,
-                transform: [
-                  {
-                    scale: r.anim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0.1, r.endScale],
-                    }),
-                  },
-                ],
-                opacity: r.anim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [r.startOpacity, 0],
-                }),
-              },
-            ]}
-          />
-        );
-      })}
-    </Pressable>
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: "#0099ff",
+          },
+          headerTintColor: "fff",
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
+        }}
+      >
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ title: "Meditation App" }}
+        />
+        <Stack.Screen
+          name="Meditation"
+          component={MeditationScreen}
+          options={{
+            title: "Meditate",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="About"
+          component={AboutScreen}
+          options={{ title: "About" }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "skyblue",
-  },
-  circle: {
-    position: "absolute",
-    borderRadius: 9999,
-    backgroundColor: "white",
-  },
-});
