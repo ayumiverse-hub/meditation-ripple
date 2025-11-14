@@ -1,6 +1,7 @@
 import { StyleSheet, Pressable, Animated } from "react-native";
 import { useState, useEffect } from "react";
 import { Audio } from "expo-av";
+import type { GestureResponderEvent } from "react-native";
 
 let rippleSeq = 0;
 const makeRippleId = () => `${Date.now()}-${rippleSeq++}`;
@@ -17,8 +18,8 @@ type Ripple = {
 };
 
 type RippleEffectProps = {
-  backgroundSound?: any;
-  rippleSound?: any;
+  backgroundSound: number;
+  rippleSound: number;
   backgroundColor?: string;
   rippleColor?: string;
   onPress?: () => void;
@@ -79,12 +80,15 @@ export default function RippleEffect({
     });
   }
 
-  async function handlePress(event: any) {
+  async function handlePress(event: GestureResponderEvent) {
     const { locationX: x, locationY: y } = event.nativeEvent;
 
     try {
       const { sound } = await Audio.Sound.createAsync(rippleSound);
-      await sound.playAsync();
+      sound.setOnPlaybackStatusUpdate((status: any) => {
+        if (status?.isLoaded && status.didJustFinish) sound.unloadAsync();
+      });
+      await sound.replayAsync();
     } catch (error) {
       console.log("Error playing ripple sound:", error);
     }
@@ -109,9 +113,7 @@ export default function RippleEffect({
       });
     }, 300);
 
-    if (onPress) {
-      onPress();
-    }
+    onPress?.();
   }
 
   return (
