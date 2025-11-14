@@ -6,8 +6,6 @@ import HomeScreen from "./screens/HomeScreen";
 import MeditationScreen from "./screens/MeditationScreen";
 import AboutScreen from "./screens/AboutScreen";
 
-const stack = createStackNavigator;
-
 type RootStackParamList = {
   Home: undefined;
   Meditation: undefined;
@@ -25,9 +23,9 @@ export default function App() {
           headerStyle: {
             backgroundColor: "#0099ff",
           },
-          headerTintColor: "fff",
+          headerTintColor: "#fff",
           headerTitleStyle: {
-            fontWeight: "bold",
+            fontWeight: "700",
           },
         }}
       >
