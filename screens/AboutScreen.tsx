@@ -17,7 +17,7 @@ export default function AboutScreen() {
   );
 }
 
-const styles = StyleSheet.creat({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#e0f2fe",
