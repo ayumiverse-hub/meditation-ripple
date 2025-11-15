@@ -5,6 +5,7 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 type RootStackParamList = {
   Home: undefined;
   Meditation: undefined;
+  Breathing: undefined;
   About: undefined;
 };
 
@@ -26,7 +27,14 @@ export default function HomeScreen({ navigation }: Props) {
         style={styles.primaryButton}
         onPress={() => navigation.navigate("Meditation")}
       >
-        <Text style={styles.primaryButtonText}>Start meditating</Text>
+        <Text style={styles.primaryButtonText}>Free Meditation</Text>
+      </Pressable>
+
+      <Pressable
+        style={styles.primaryButton}
+        onPress={() => navigation.navigate("Breathing")}
+      >
+        <Text style={styles.primaryButtonText}>Guided Breathing</Text>
       </Pressable>
 
       <Pressable
