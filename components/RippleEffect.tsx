@@ -1,7 +1,7 @@
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Pressable, Animated } from "react-native";
-import { useState, useEffect } from "react";
-import { Audio } from "expo-av";
 import type { GestureResponderEvent } from "react-native";
+import { Audio } from "expo-av";
 
 let rippleSeq = 0;
 const makeRippleId = () => `${Date.now()}-${rippleSeq++}`;
@@ -63,11 +63,7 @@ export default function RippleEffect({
 
   function spawnRipple(opts: Omit<Ripple, "id" | "anim">) {
     const anim = new Animated.Value(0);
-    const ripple: Ripple = {
-      id: makeRippleId(),
-      anim,
-      ...opts,
-    };
+    const ripple: Ripple = { id: makeRippleId(), anim, ...opts };
 
     setRipples((curr) => [...curr, ripple]);
 
@@ -85,10 +81,7 @@ export default function RippleEffect({
 
     try {
       const { sound } = await Audio.Sound.createAsync(rippleSound);
-      sound.setOnPlaybackStatusUpdate((status: any) => {
-        if (status?.isLoaded && status.didJustFinish) sound.unloadAsync();
-      });
-      await sound.replayAsync();
+      await sound.playAsync();
     } catch (error) {
       console.log("Error playing ripple sound:", error);
     }
@@ -153,11 +146,6 @@ export default function RippleEffect({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  circle: {
-    position: "absolute",
-    borderRadius: 9999,
-  },
+  container: { flex: 1 },
+  circle: { position: "absolute", borderRadius: 9999 },
 });

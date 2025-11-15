@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import { StackNavigationProp } from "@react-navigation/stack";
+import type { StackNavigationProp } from "@react-navigation/stack";
 
 type RootStackParamList = {
   Home: undefined;
@@ -19,7 +19,7 @@ export default function HomeScreen({ navigation }: Props) {
     <View style={styles.container}>
       <Text style={styles.title}>Ripple Meditation</Text>
       <Text style={styles.subtitle}>
-        Tap to create ripples, relax with flowing water and soft drops.
+        Tap to create ripples, hear soft water, and unwind.
       </Text>
 
       <Pressable
