@@ -4,11 +4,13 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import HomeScreen from "./screens/HomeScreen";
 import MeditationScreen from "./screens/MeditationScreen";
+import GuidedBreathing from "./screens/GuidedBreathing";
 import AboutScreen from "./screens/AboutScreen";
 
 type RootStackParamList = {
   Home: undefined;
   Meditation: undefined;
+  Breathing: undefined;
   About: undefined;
 };
 
@@ -26,6 +28,11 @@ export default function App() {
         <Stack.Screen
           name="Meditation"
           component={MeditationScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Breathing"
+          component={GuidedBreathing}
           options={{ headerShown: false }}
         />
         <Stack.Screen
