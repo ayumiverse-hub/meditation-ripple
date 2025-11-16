@@ -49,6 +49,8 @@ export default function BreathingRipple({
 
   // breathing cycle
   useEffect(() => {
+    let isMounted = true;
+
     const runBreathingCycle = () => {
       const speak = (text: String) => {
         Speech.speak(text, {
@@ -56,6 +58,10 @@ export default function BreathingRipple({
           pitch: 1.0,
           rate: 0.8,
         });
+      };
+
+      const singleCycle = async () => {
+        if (!isMounted) return;
       };
 
       const singleCycle = async () => {
@@ -73,6 +79,8 @@ export default function BreathingRipple({
         speak("Hold");
         await new Promise((resolve) => setTimeout(resolve, 7000));
 
+        if (!isMounted) return;
+
         setCurrentPhase("exhale");
         speak("Breathe out");
         await new Promise((resolve) => {
@@ -85,7 +93,7 @@ export default function BreathingRipple({
       };
 
       const runForever = async () => {
-        while (true) {
+        while (isMounted) {
           await singleCycle();
         }
       };
@@ -93,6 +101,11 @@ export default function BreathingRipple({
     };
 
     runBreathingCycle();
+
+    return () => {
+      isMounted = false;
+      Speech.stop();
+    };
   }, [rippleScale]);
 
   return (
