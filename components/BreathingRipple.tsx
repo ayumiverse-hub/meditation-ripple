@@ -52,7 +52,7 @@ export default function BreathingRipple({
     let isMounted = true;
 
     const runBreathingCycle = () => {
-      const speak = (text: String) => {
+      const speak = (text: string) => {
         Speech.speak(text, {
           language: "en-US",
           pitch: 1.0,
@@ -62,9 +62,7 @@ export default function BreathingRipple({
 
       const singleCycle = async () => {
         if (!isMounted) return;
-      };
 
-      const singleCycle = async () => {
         setCurrentPhase("inhale");
         speak("Breathe in");
         await new Promise((resolve) => {
@@ -110,7 +108,6 @@ export default function BreathingRipple({
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      {/* the breating ripple */}
       <Animated.View
         style={[
           styles.ripple,
@@ -120,7 +117,7 @@ export default function BreathingRipple({
           },
         ]}
       />
-      {/* Text overlay showing current phase */}
+
       <Text style={styles.phaseText}>
         {currentPhase === "inhale" && "Breathe in..."}
         {currentPhase === "hold" && "Hold..."}

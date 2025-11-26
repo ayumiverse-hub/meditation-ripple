@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, Pressable, Animated } from "react-native";
 import type { GestureResponderEvent } from "react-native";
 import { Audio } from "expo-av";
@@ -33,8 +33,10 @@ export default function RippleEffect({
   onPress,
 }: RippleEffectProps) {
   const [ripples, setRipples] = useState<Ripple[]>([]);
+  const isMounted = useRef(true);
 
   useEffect(() => {
+    isMounted.current = true;
     let bgSound: Audio.Sound;
 
     (async () => {
@@ -57,11 +59,14 @@ export default function RippleEffect({
     })();
 
     return () => {
+      isMounted.current = false;
       bgSound?.unloadAsync();
     };
   }, [backgroundSound]);
 
   function spawnRipple(opts: Omit<Ripple, "id" | "anim">) {
+    if (!isMounted.current) return;
+
     const anim = new Animated.Value(0);
     const ripple: Ripple = { id: makeRippleId(), anim, ...opts };
 
@@ -72,15 +77,24 @@ export default function RippleEffect({
       duration: ripple.duration,
       useNativeDriver: true,
     }).start(() => {
-      setRipples((curr) => curr.filter((r) => r.id !== ripple.id));
+      if (isMounted.current) {
+        setRipples((curr) => curr.filter((r) => r.id !== ripple.id));
+      }
     });
   }
 
   async function handlePress(event: GestureResponderEvent) {
+    if (!isMounted.current) return;
+
     const { locationX: x, locationY: y } = event.nativeEvent;
 
     try {
       const { sound } = await Audio.Sound.createAsync(rippleSound);
+      sound.setOnPlaybackStatusUpdate((status: any) => {
+        if (status?.isLoaded && status.didJustFinish) {
+          sound.unloadAsync();
+        }
+      });
       await sound.playAsync();
     } catch (error) {
       console.log("Error playing ripple sound:", error);
@@ -95,15 +109,17 @@ export default function RippleEffect({
       duration: 1500,
     });
 
-    setTimeout(() => {
-      spawnRipple({
-        x,
-        y,
-        size: 70,
-        startOpacity: 0.2,
-        endScale: 1.5,
-        duration: 1200,
-      });
+    const timeout = setTimeout(() => {
+      if (isMounted.current) {
+        spawnRipple({
+          x,
+          y,
+          size: 70,
+          startOpacity: 0.2,
+          endScale: 1.5,
+          duration: 1200,
+        });
+      }
     }, 300);
 
     onPress?.();

@@ -1,5 +1,5 @@
 import React from "react";
-import BreathingRipple from "./BreathingRipple";
+import BreathingRipple from "../components/BreathingRipple";
 
 export default function GuidedBreathing() {
   return (
